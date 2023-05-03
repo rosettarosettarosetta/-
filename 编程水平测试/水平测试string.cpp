@@ -1,0 +1,202 @@
+﻿#include<iostream>
+#include<fstream>//ofstream--只写、ifstream--只读、fstream--可读可写
+#include<cstring>
+#include<string>
+
+using namespace std;
+
+void ReadIn();
+void SexJudge();
+void MonJudge();
+int PeopleNeeded(string);
+void ChangeData();
+void Addtudent();
+void sort();
+
+//定义结构体
+struct stu {	//结构体大写的是一种新类型
+
+	int id;//char[5]
+	string name;
+	string sex;
+	string pro;
+	int birthyear;
+	int birthmon;
+	int birthday;
+	int st;
+};
+
+stu stus[40];//结构体
+char a;
+int ruler = 30;//实时的人数
+int main()
+{
+	ReadIn();//读入文档
+	int b = 1;
+	while (b)//多次访问
+	{
+		cout << "目录：\n" << "(1)男女人数识别\n(2)11月份的出生人数\n";
+		cout << "(3)身份查询 \n(4)修改生源地（宋羽玲）\n(5)输入新的学生信息\n";
+		cout << "(6)按照出生日期排升序输出\n(7)结束进程\n(请输入数字)\n";
+		int k;
+		cin >> k;
+		switch (k)
+		{
+		case 1:SexJudge();
+			break;
+		case 2:MonJudge();
+			break;
+
+		case 3:
+		{cout << "你想搜索的名字是\n";
+		string name1;
+		cin >> name1;
+		if (PeopleNeeded(name1) == 0) cout << "没有这个同学的信息\n";
+		break; }
+
+		case 4:ChangeData();
+			break;
+		case 5:Addtudent();
+			break;
+		case 6:
+			sort();
+			break;
+		case 7: b = 0;
+			break;
+		}
+	}
+	cout << "感谢使用";
+	return 0;
+}
+
+void ReadIn()//读入文档
+{
+	ifstream file;//配合头文件定义的文件对象
+
+	file.open("C:/Users/童殿/Desktop/Rosetta‘s stone/大学/计算机/作业/期末大作业/student.txt", ios::in);//它建立了file和文件的关系
+	
+	if (!file) cout << "检查输入是否正确";//收留“/”
+	for (int i = 0; i < ruler; i++)
+	{
+		file >> stus[i].id >> stus[i].name >> stus[i].sex >> stus[i].pro >> stus[i].birthyear >> a >> stus[i].birthmon >> a >> stus[i].birthday;
+
+	}
+	//子串对子串不能直接赋值
+}
+
+void SexJudge()
+{
+	int woman = 0, man = 0;
+	for (int i = 0; i < ruler; i++)
+	{
+		if (stus[i].sex=="男")   man++;
+		else woman++;
+	}
+	cout << "女生的数量是" << woman << "人" << endl << "男生的数量是" << man << "人" << endl;
+
+}
+
+void MonJudge()//11月生的有几人
+{
+	int mon = 0;
+	for (int i = 0; i < ruler; i++)
+	{
+		if (stus[i].birthmon==11)   mon++;
+
+	}
+	cout << "11月份生的是" << mon << "人" << endl;
+
+}
+
+
+int PeopleNeeded(string name)
+{
+	int a = 0;
+	for (int i = 0; i < ruler; i++)
+	{
+		if (stus[i].name == name)
+		{
+			cout << "姓名" << stus[i].name << "\t\t学号" << stus[i].id << "\t\t性别" << stus[i].sex << "\t\t省份" << stus[i].pro << "\t\t出生日期" << stus[i].birthyear << "/" << stus[i].birthmon << "/" << stus[i].birthday << endl;
+			a++;
+			break;
+		}
+	}
+	return a;
+}
+
+void ChangeData()
+{
+	int k = -1;
+	for (int i = 0; i < ruler; i++)
+	{
+		if (stus[i].name=="宋羽玲")
+		{
+			k = i;
+			stus[i].pro = "江苏省";
+			break;
+		}
+	}
+	if (k == -1)
+	{
+		cout << "没有这个人";
+		return;
+	}
+	fstream outfile("C:/Users/童殿/Desktop/Rosetta‘s stone/大学/计算机/作业/期末大作业/student.txt");
+	
+	for (int i = 0; i < ruler; i++)
+	{	
+	outfile << stus[i].id << '\t' << stus[i].name << '\t' << stus[i].sex << '\t' << stus[i].pro << "  \t" << stus[i].birthyear << a<< stus[i].birthmon << a << stus[i].birthday << endl;
+	}
+	outfile.close();
+	cout << "已经将宋羽玲的省份改为" << stus[k].pro<<endl;
+}
+
+void Addtudent()
+{
+	stus[ruler].id = 1031;
+	stus[ruler].name = "潘思辉";
+	stus[ruler].sex = "男";
+	stus[ruler].pro = "山东省";
+	stus[ruler].birthyear = 2004;
+	stus[ruler].birthmon = 7;
+	stus[ruler].birthday = 15;
+	ruler++;
+}
+
+void sort()//日期升序输出
+{
+	int arr[12][7];//相同月份排一横排
+	int arrf[12]={0};//记录一桶里多少
+	for (int i = 0; i < ruler; i++)
+	{
+		arr[stus[i].birthmon-1][arrf[stus[i].birthmon - 1]]=i;
+		int t = arrf[stus[i].birthmon - 1];//i在排序后所在的实时位置
+		for (int k = arrf[stus[i].birthmon - 1]-1; k >= 0; k--)
+		{
+			int f = arr[stus[i].birthmon - 1][k];
+			if (stus[f].birthday >stus[i].birthday)//数据对调
+			{
+				int f = arr[stus[i].birthmon - 1][k];
+                arr[stus[i].birthmon - 1][k] = i;
+				arr[stus[i].birthmon - 1][t] = f;
+				t = k;
+			}
+		}
+		arrf[stus[i].birthmon - 1]++; 
+	}
+
+	for (int year = 2003; year <= 2004; year++)
+	{
+		for (int i = 0; i < 12; i++)
+		{
+			for (int j = 0; j < arrf[i]; j++)
+			{
+				if (stus[arr[i][j]].birthyear == year)
+				{
+					cout << stus[arr[i][j]].id << '\t' << stus[arr[i][j]].name << '\t' << stus[arr[i][j]].birthyear << "/" << stus[arr[i][j]].birthmon << "/" << stus[arr[i][j]].birthday << endl;
+				}
+			}
+		}
+	}
+
+}
